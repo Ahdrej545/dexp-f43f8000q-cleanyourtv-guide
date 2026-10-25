@@ -4,13 +4,9 @@
 
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
 $Launcher = "com.gathin.tvhome/.MainActivity"
-# Optional apps only. The stock Yandex launcher is intentionally NOT in this list.
-$StopList = @(
-    "ru.vk.store.tv",
-    "com.yandex.browser.tv",
-    "com.swiftsoft.anixartd"
-)
+$StopList = @("ru.vk.store.tv", "com.yandex.browser.tv", "com.swiftsoft.anixartd")
 $Desktop = [Environment]::GetFolderPath("Desktop")
+if ([string]::IsNullOrWhiteSpace($Desktop)) { $Desktop = $HOME }
 $script:TvAddr = $null
 
 function Test-Adb {
@@ -19,7 +15,6 @@ function Test-Adb {
         exit 1
     }
 }
-
 function Initialize-TvAddress {
     while ($true) {
         $ip = Read-Host "IP-адрес телевизора из сетевых настроек (без :5555)"
@@ -29,25 +24,26 @@ function Initialize-TvAddress {
             $script:TvAddr = $ip + ":5555"
             return
         }
-        Write-Host "Введите корректный IPv4-адрес." -ForegroundColor Yellow
+        Write-Host "Введите корректный IPv4-адрес телевизора." -ForegroundColor Yellow
     }
 }
-
+function Get-TvState {
+    $state = (& adb -s $script:TvAddr get-state 2>$null | Select-Object -Last 1)
+    if ($null -eq $state) { return "" }
+    return $state.ToString().Trim()
+}
 function Connect-Tv {
-    $list = (adb devices) -join [Environment]::NewLine
-    if ($list -notmatch ([regex]::Escape($script:TvAddr) + "\s+device")) {
+    if ((Get-TvState) -ne "device") {
         Write-Host "Подключаюсь к $script:TvAddr ..."
-        adb connect $script:TvAddr
+        & adb connect $script:TvAddr
         Start-Sleep -Seconds 2
-        $list = (adb devices) -join [Environment]::NewLine
     }
-    if ($list -notmatch ([regex]::Escape($script:TvAddr) + "\s+device")) {
-        Write-Host "Нет соединения. Проверьте IP, домашнюю сеть и разрешение ADB на телевизоре." -ForegroundColor Yellow
+    if ((Get-TvState) -ne "device") {
+        Write-Host "Нет авторизованного соединения. Проверьте IP, сеть, ADB и подтверждение на телевизоре." -ForegroundColor Yellow
         return $false
     }
     return $true
 }
-
 function Show-Menu {
     Clear-Host
     Write-Host "=== DEXP F43F8000Q-G / CleanYourTV ===" -ForegroundColor Cyan
@@ -64,37 +60,36 @@ function Show-Menu {
     Write-Host " 0. Выход"
     Write-Host ""
 }
-
 function Invoke-Choice($choice) {
     switch ($choice) {
         "1" {
-            if (Connect-Tv) { adb devices }
+            if (Connect-Tv) { & adb devices }
         }
         "2" {
             Write-Host "Будут принудительно закрыты только следующие приложения:" -ForegroundColor Yellow
             $StopList | ForEach-Object { Write-Host " - $_" }
             Write-Host "Штатный лаунчер Яндекса не закрывается этим пунктом."
-            $answer = Read-Host "Продолжить? (y/n)"
-            if ($answer -match '^(y|yes)$' -and (Connect-Tv)) {
+            $answer = Read-Host "Продолжить? (y/n или д/да)"
+            if ($answer -match '^(y|yes|д|да)$' -and (Connect-Tv)) {
                 foreach ($pkg in $StopList) {
                     Write-Host "Закрываю $pkg"
-                    adb -s $script:TvAddr shell am force-stop $pkg
+                    & adb -s $script:TvAddr shell am force-stop $pkg
                 }
                 Write-Host "Готово. Это не очищает системную RAM; приложения могут запуститься снова." -ForegroundColor Green
             }
         }
         "3" {
             if (Connect-Tv) {
-                adb -s $script:TvAddr shell cmd package set-home-activity --user 0 $Launcher
-                adb -s $script:TvAddr shell am start -n $Launcher
+                & adb -s $script:TvAddr shell cmd package set-home-activity --user 0 $Launcher
+                & adb -s $script:TvAddr shell am start -n $Launcher
             }
         }
         "4" {
             if (Connect-Tv) {
-                adb -s $script:TvAddr shell cat /proc/meminfo
+                & adb -s $script:TvAddr shell cat /proc/meminfo
                 Write-Host ""
-                Write-Host "Сводка процесса/системы:"
-                adb -s $script:TvAddr shell dumpsys meminfo | Select-String "Total RAM|Free RAM|Used RAM|Lost RAM|ZRAM"
+                Write-Host "Сводка dumpsys meminfo:"
+                & adb -s $script:TvAddr shell dumpsys meminfo | Select-String "Total RAM|Free RAM|Used RAM|Lost RAM|ZRAM"
             }
         }
         "5" {
@@ -103,32 +98,34 @@ function Invoke-Choice($choice) {
                 $file = Join-Path $Desktop ("tv-" + $stamp + ".png")
                 $cmd = 'adb -s ' + $script:TvAddr + ' exec-out screencap -p > "' + $file + '"'
                 cmd.exe /d /s /c $cmd
-                if (Test-Path $file) {
+                if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
                     Write-Host "Скриншот сохранён: $file" -ForegroundColor Green
                     Write-Host "Проверьте изображение на Wi-Fi-имя, адреса и личные сведения перед публикацией."
                 } else {
-                    Write-Host "Не удалось сохранить скриншот." -ForegroundColor Yellow
+                    Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue
+                    Write-Host "Не удалось сохранить скриншот; пустой файл удалён." -ForegroundColor Yellow
                 }
             }
         }
         "6" {
-            if (Connect-Tv) {
-                adb -s $script:TvAddr shell pm list packages -d
-            }
+            if (Connect-Tv) { & adb -s $script:TvAddr shell pm list packages -d }
         }
         "7" {
             if (Connect-Tv) {
                 $dest = Join-Path $Desktop ("tv-launcher-backup-" + (Get-Date -Format "yyyyMMdd-HHmmss"))
                 New-Item -ItemType Directory -Path $dest -Force | Out-Null
-                adb -s $script:TvAddr pull /sdcard/Android/data/com.gathin.tvhome/files $dest
-                Write-Host "Если каталог существует и доступен, копия находится в: $dest" -ForegroundColor Green
-                Write-Host "Успех зависит от версии приложения и разрешений Android."
+                & adb -s $script:TvAddr pull /sdcard/Android/data/com.gathin.tvhome/files $dest
+                if ($LASTEXITCODE -eq 0) {
+                    Write-Host "Команда копирования завершилась. Проверьте файлы в: $dest" -ForegroundColor Green
+                } else {
+                    Write-Host "Не удалось скопировать каталог. Android может скрывать его или каталог может отсутствовать." -ForegroundColor Yellow
+                }
             }
         }
         "8" {
-            $answer = Read-Host "Перезагрузить телевизор? Это прервёт просмотр. (y/n)"
-            if ($answer -match '^(y|yes)$' -and (Connect-Tv)) {
-                adb -s $script:TvAddr reboot
+            $answer = Read-Host "Перезагрузить телевизор? Это прервёт просмотр. (y/n или д/да)"
+            if ($answer -match '^(y|yes|д|да)$' -and (Connect-Tv)) {
+                & adb -s $script:TvAddr reboot
                 Write-Host "Телевизор перезагружается. ADB может появиться снова после загрузки."
             }
         }
@@ -137,7 +134,6 @@ function Invoke-Choice($choice) {
         default { Write-Host "Нет такого пункта." -ForegroundColor Yellow }
     }
 }
-
 Test-Adb
 Initialize-TvAddress
 while ($true) {
