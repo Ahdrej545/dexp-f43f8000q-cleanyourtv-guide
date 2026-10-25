@@ -1,0 +1,24 @@
+{
+  "background_color": "#070A14",
+  "wallpaper": true,
+  "columns": 6,
+  "rows_below_dock": 1,
+  "reduced_motion": true,
+  "show_stats": true,
+  "dock_apps": [
+    "org.smarttube.stable",
+    "org.videolan.vlc",
+    "ru.vk.store.tv",
+    "com.yandex.browser.tv"
+  ],
+  "hidden_apps": [
+    "com.hisilicon.miracast",
+    "com.yandex.tv.ytplayer",
+    "com.cybercat.acbridge",
+    "com.cybercat.adbappcontrol.tv",
+    "com.cvte.tv.media"
+  ],
+  "app_glow": true,
+  "dock_glass": true,
+  "glow_style": "horizon"
+}
