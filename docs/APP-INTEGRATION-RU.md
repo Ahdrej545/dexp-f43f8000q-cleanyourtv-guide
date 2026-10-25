@@ -27,6 +27,33 @@
 
 Приложение имеет заявленные механизмы восстановления и watchdog, однако никакая программная защита не заменяет проверку совместимости и наличие физического доступа к пульту и настройкам телевизора.
 
+
+## Текущее состояние заявки #611
+
+Проверено 25 октября 2026 года: [заявка на поддержку DEXP F43F8000Q-G](https://github.com/udhaykumarbala/cleanyourtv-app/issues/611) открыта; комментариев разработчиков ещё нет.
+
+Мобильное приложение 0.3.6 использовалось только для подключения и чтения отчёта. Кнопка `Make it clean` не нажималась. Поэтому шесть пакетов в строке `Off, disabled-user` — состояние, зафиксированное в отчёте, а не изменение, выполненное этим тестом приложения.
+
+Отчёт фиксирует:
+- устройство `F43F8000Q-G.HV430FHB-F90`, Android 9 / SDK 28;
+- HOME разрешается в `com.gathin.tvhome/.MainActivity`;
+- сопоставленный профиль не найден (`Profile: none`);
+- переключение HOME приложением заблокировано с причиной `HOME_CHANGED`.
+
+### Подготовленный комментарий для заявки
+
+Если нужно уточнить заявку, этот английский текст можно добавить комментарием в Issue #611. Он не отправляется автоматически:
+
+> Thanks! I only used Clean Your TV App 0.3.6 to connect to the TV and read the report. I did not press “Make it clean” or run a cleanup from the app, so this test did not apply package changes.
+>
+> The DEXP F43F8000Q-G was already manually configured with CleanYourTV before this mobile-app test. The report shows HOME resolving to `com.gathin.tvhome/.MainActivity`; the existing setup has survived a reboot.
+>
+> The six packages shown as disabled in the report were already disabled at the time of inspection; they were not disabled by this app test. I would like to review any proposed DEXP profile before applying it and then test it for several days, checking Home, voice control, HDMI/input switching, Wi-Fi and reboot recovery.
+>
+> Please advise the next step for preparing a safe profile for firmware `F43F8000Q-G.HV430FHB-F90`, Android 9 / SDK 28.
+
+Не публикуй телефонный ключ, MAC-адрес, Wi-Fi-имя, IP-адрес или полный диагностический дамп. Полный список пакетов стоит прикладывать только если сопровождающие действительно попросят его, после отдельной проверки на личные данные.
+
 ## Как добавить полноценный профиль DEXP в приложение
 
 В документации мобильного приложения описан двухэтапный процесс. Вначале изменения вносятся в upstream-списки Clean Your TV, затем приложение обновляет закреплённый upstream-коммит и получает метаданные модели.
