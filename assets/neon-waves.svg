@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1280" height="720" viewBox="0 0 1280 720" role="img" aria-labelledby="title desc">
+  <title id="title">CleanYourTV neon waves wallpaper</title>
+  <desc id="desc">Minimalist dark navy background with cyan, blue, violet, magenta and green flowing neon curves.</desc>
+  <defs>
+    <linearGradient id="cyan" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#11e8ee" stop-opacity=".45"/>
+      <stop offset=".45" stop-color="#05f4f3"/>
+      <stop offset="1" stop-color="#0aa1ef" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="violet" x1="0" y1="0" x2="1" y2=".2">
+      <stop offset="0" stop-color="#654cff" stop-opacity=".45"/>
+      <stop offset=".52" stop-color="#5c7dff"/>
+      <stop offset="1" stop-color="#a83cff" stop-opacity=".8"/>
+    </linearGradient>
+    <linearGradient id="magenta" x1="0" y1="0" x2="1" y2=".1">
+      <stop offset="0" stop-color="#8b40ff" stop-opacity=".65"/>
+      <stop offset=".55" stop-color="#ff27be"/>
+      <stop offset="1" stop-color="#b832ff" stop-opacity=".6"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#00c99a" stop-opacity=".2"/>
+      <stop offset=".55" stop-color="#00f5ba"/>
+      <stop offset="1" stop-color="#00d9a0" stop-opacity=".7"/>
+    </linearGradient>
+    <radialGradient id="ambient" cx="50%" cy="50%" r="70%">
+      <stop offset="0" stop-color="#13102b"/>
+      <stop offset="1" stop-color="#03050d"/>
+    </radialGradient>
+    <filter id="glow" x="-20%" y="-30%" width="140%" height="160%">
+      <feGaussianBlur stdDeviation="2.4" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+    <filter id="softGlow" x="-20%" y="-30%" width="140%" height="160%">
+      <feGaussianBlur stdDeviation="8"/>
+    </filter>
+  </defs>
+  <rect width="1280" height="720" fill="url(#ambient)"/>
+  <g fill="none" stroke-linecap="round">
+    <g stroke="url(#cyan)" filter="url(#softGlow)" opacity=".34" stroke-width="10">
+      <path d="M-60 350 C145 365 250 475 440 423 S760 270 920 248 S1120 260 1340 330"/>
+      <path d="M-60 410 C170 390 265 450 450 420 S780 298 920 252 S1120 270 1340 330"/>
+    </g>
+    <g stroke="url(#cyan)" filter="url(#glow)" stroke-width="2.3" opacity=".94">
+      <path d="M-60 350 C145 365 250 475 440 423 S760 270 920 248 S1120 260 1340 330"/>
+      <path d="M-60 360 C150 378 255 480 438 432 S760 280 920 255 S1120 278 1340 340"/>
+      <path d="M-60 370 C160 390 260 486 438 442 S760 290 920 262 S1120 296 1340 350"/>
+      <path d="M-60 380 C170 402 270 492 438 452 S760 300 920 269 S1120 314 1340 360"/>
+      <path d="M-60 390 C180 414 280 498 438 462 S760 310 920 276 S1120 332 1340 370"/>
+    </g>
+    <g stroke="url(#violet)" filter="url(#softGlow)" opacity=".28" stroke-width="10">
+      <path d="M-60 520 C160 465 260 330 440 344 S760 450 930 412 S1130 362 1340 402"/>
+    </g>
+    <g stroke="url(#violet)" filter="url(#glow)" stroke-width="2.2" opacity=".9">
+      <path d="M-60 520 C160 465 260 330 440 344 S760 450 930 412 S1130 362 1340 402"/>
+      <path d="M-60 532 C160 477 260 342 440 356 S760 462 930 424 S1130 374 1340 414"/>
+      <path d="M-60 544 C160 489 260 354 440 368 S760 474 930 436 S1130 386 1340 426"/>
+      <path d="M-60 556 C160 501 260 366 440 380 S760 486 930 448 S1130 398 1340 438"/>
+    </g>
+    <g stroke="url(#magenta)" filter="url(#softGlow)" opacity=".32" stroke-width="9">
+      <path d="M-60 560 C110 490 220 650 420 592 S700 418 860 444 S1110 570 1340 540"/>
+    </g>
+    <g stroke="url(#magenta)" filter="url(#glow)" stroke-width="2.1" opacity=".91">
+      <path d="M-60 548 C110 478 220 638 420 580 S700 406 860 432 S1110 558 1340 528"/>
+      <path d="M-60 560 C110 490 220 650 420 592 S700 418 860 444 S1110 570 1340 540"/>
+      <path d="M-60 572 C110 502 220 662 420 604 S700 430 860 456 S1110 582 1340 552"/>
+      <path d="M-60 584 C110 514 220 674 420 616 S700 442 860 468 S1110 594 1340 564"/>
+    </g>
+    <g stroke="url(#green)" filter="url(#softGlow)" opacity=".25" stroke-width="10">
+      <path d="M-60 620 C170 760 290 700 450 575 S740 500 900 600 S1120 670 1340 600"/>
+    </g>
+    <g stroke="url(#green)" filter="url(#glow)" stroke-width="2.1" opacity=".9">
+      <path d="M-60 600 C170 740 290 680 450 555 S740 480 900 580 S1120 650 1340 580"/>
+      <path d="M-60 612 C170 752 290 692 450 567 S740 492 900 592 S1120 662 1340 592"/>
+      <path d="M-60 624 C170 764 290 704 450 579 S740 504 900 604 S1120 674 1340 604"/>
+      <path d="M-60 636 C170 776 290 716 450 591 S740 516 900 616 S1120 686 1340 616"/>
+    </g>
+  </g>
+</svg>
