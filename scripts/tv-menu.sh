@@ -4,14 +4,8 @@
 # This script does not disable or uninstall system packages.
 
 set -u
-
 LAUNCHER="com.gathin.tvhome/.MainActivity"
-# Optional apps only. The stock Yandex launcher is intentionally NOT in this list.
-STOP_LIST=(
-  "ru.vk.store.tv"
-  "com.yandex.browser.tv"
-  "com.swiftsoft.anixartd"
-)
+STOP_LIST=("ru.vk.store.tv" "com.yandex.browser.tv" "com.swiftsoft.anixartd")
 DESKTOP="$(xdg-user-dir DESKTOP 2>/dev/null || echo "$HOME")"
 TV_ADDR=""
 
@@ -29,14 +23,14 @@ read_tv_ip() {
       TV_ADDR="$ip:5555"
       return
     fi
-    echo "Введите корректный IPv4-адрес."
+    echo "Введите корректный IPv4-адрес телевизора."
   done
 }
-
 is_connected() {
-  adb devices | grep -Fq "$(printf '%s\tdevice' "$TV_ADDR")"
+  local state
+  state="$(adb -s "$TV_ADDR" get-state 2>/dev/null || true)"
+  [[ "$state" == "device" ]]
 }
-
 connect_tv() {
   if ! is_connected; then
     echo "Подключаюсь к $TV_ADDR ..."
@@ -44,12 +38,11 @@ connect_tv() {
     sleep 2
   fi
   if ! is_connected; then
-    echo "Нет соединения. Проверьте IP, сеть и разрешение ADB на телевизоре."
+    echo "Нет авторизованного соединения. Проверьте IP, сеть, ADB и подтверждение на телевизоре."
     return 1
   fi
   return 0
 }
-
 show_menu() {
   clear
   echo "=== DEXP F43F8000Q-G / CleanYourTV ==="
@@ -66,7 +59,6 @@ show_menu() {
   echo " 0. Выход"
   echo
 }
-
 while true; do
   show_menu
   read -r -p "Выбор: " choice
@@ -78,8 +70,8 @@ while true; do
       echo "Будут принудительно закрыты только эти приложения:"
       printf ' - %s\n' "${STOP_LIST[@]}"
       echo "Штатный лаунчер Яндекса этим пунктом не закрывается."
-      read -r -p "Продолжить? (y/n) " answer
-      if [[ "$answer" =~ ^([yY]|[yY][eE][sS])$ ]] && connect_tv; then
+      read -r -p "Продолжить? (y/n или д/да) " answer
+      if [[ "$answer" =~ ^([yY]|[yY][eE][sS]|[дД]|[дД][аА])$ ]] && connect_tv; then
         for pkg in "${STOP_LIST[@]}"; do
           echo "Закрываю $pkg"
           adb -s "$TV_ADDR" shell am force-stop "$pkg"
@@ -104,8 +96,13 @@ while true; do
       if connect_tv; then
         file="${DESKTOP}/tv-$(date +%Y%m%d-%H%M%S).png"
         if adb -s "$TV_ADDR" exec-out screencap -p > "$file"; then
-          echo "Скриншот сохранён: $file"
-          echo "Проверьте Wi-Fi-имя, адреса и личные сведения перед публикацией."
+          if [[ -s "$file" ]]; then
+            echo "Скриншот сохранён: $file"
+            echo "Проверьте Wi-Fi-имя, адреса и личные сведения перед публикацией."
+          else
+            rm -f "$file"
+            echo "ADB вернул пустой скриншот; пустой файл удалён."
+          fi
         else
           rm -f "$file"
           echo "Не удалось сохранить скриншот."
@@ -119,14 +116,16 @@ while true; do
       if connect_tv; then
         dest="${DESKTOP}/tv-launcher-backup-$(date +%Y%m%d-%H%M%S)"
         mkdir -p "$dest"
-        adb -s "$TV_ADDR" pull /sdcard/Android/data/com.gathin.tvhome/files "$dest"
-        echo "Если каталог существует и доступен, копия находится в: $dest"
-        echo "Успех зависит от версии приложения и разрешений Android."
+        if adb -s "$TV_ADDR" pull /sdcard/Android/data/com.gathin.tvhome/files "$dest"; then
+          echo "Команда копирования завершилась. Проверьте файлы в: $dest"
+        else
+          echo "Не удалось скопировать каталог. Android может скрывать его или каталог может отсутствовать."
+        fi
       fi
       ;;
     8)
-      read -r -p "Перезагрузить телевизор? Это прервёт просмотр. (y/n) " answer
-      if [[ "$answer" =~ ^([yY]|[yY][eE][sS])$ ]] && connect_tv; then
+      read -r -p "Перезагрузить телевизор? Это прервёт просмотр. (y/n или д/да) " answer
+      if [[ "$answer" =~ ^([yY]|[yY][eE][sS]|[дД]|[дД][аА])$ ]] && connect_tv; then
         adb -s "$TV_ADDR" reboot
         echo "Телевизор перезагружается. ADB может появиться снова после загрузки."
       fi
