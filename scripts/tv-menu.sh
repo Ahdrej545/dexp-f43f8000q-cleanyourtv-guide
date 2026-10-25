@@ -26,7 +26,7 @@ read_tv_ip() {
     read -r -p "IP-адрес телевизора из сетевых настроек (без :5555): " ip
     if [[ "$ip" =~ ^([0-9]{1,3}\.){3}[0-9]{1,3}$ ]] &&
        awk -F. 'NF==4 {for(i=1;i<=4;i++) if($i<0 || $i>255) exit 1; exit 0} {exit 1}' <<< "$ip"; then
-      TV_ADDR="$ip}:5555"
+      TV_ADDR="$ip:5555"
       return
     fi
     echo "Введите корректный IPv4-адрес."
@@ -34,7 +34,7 @@ read_tv_ip() {
 }
 
 is_connected() {
-  adb devices | grep -Fq "$(printf '%s\\tdevice' "$TV_ADDR")"
+  adb devices | grep -Fq "$(printf '%s\tdevice' "$TV_ADDR")"
 }
 
 connect_tv() {
@@ -76,11 +76,11 @@ while true; do
       ;;
     2)
       echo "Будут принудительно закрыты только эти приложения:"
-      printf ' - %s\\n' "$STOP_LIST[@]}"
+      printf ' - %s\n' "${STOP_LIST[@]}"
       echo "Штатный лаунчер Яндекса этим пунктом не закрывается."
       read -r -p "Продолжить? (y/n) " answer
       if [[ "$answer" =~ ^([yY]|[yY][eE][sS])$ ]] && connect_tv; then
-        for pkg in "$STOP_LIST[@]}"; do
+        for pkg in "${STOP_LIST[@]}"; do
           echo "Закрываю $pkg"
           adb -s "$TV_ADDR" shell am force-stop "$pkg"
         done
@@ -102,7 +102,7 @@ while true; do
       ;;
     5)
       if connect_tv; then
-        file="$DESKTOP}/tv-$(date +%Y%m%d-%H%M%S).png"
+        file="${DESKTOP}/tv-$(date +%Y%m%d-%H%M%S).png"
         if adb -s "$TV_ADDR" exec-out screencap -p > "$file"; then
           echo "Скриншот сохранён: $file"
           echo "Проверьте Wi-Fi-имя, адреса и личные сведения перед публикацией."
@@ -117,7 +117,7 @@ while true; do
       ;;
     7)
       if connect_tv; then
-        dest="$DESKTOP}/tv-launcher-backup-$(date +%Y%m%d-%H%M%S)"
+        dest="${DESKTOP}/tv-launcher-backup-$(date +%Y%m%d-%H%M%S)"
         mkdir -p "$dest"
         adb -s "$TV_ADDR" pull /sdcard/Android/data/com.gathin.tvhome/files "$dest"
         echo "Если каталог существует и доступен, копия находится в: $dest"
