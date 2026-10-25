@@ -1,5 +1,7 @@
 # DEXP F43F8000Q-G + CleanYourTV
 
+[![Проверки репозитория](https://github.com/Ahdrej545/dexp-f43f8000q-cleanyourtv-guide/actions/workflows/validate.yml/badge.svg)](https://github.com/Ahdrej545/dexp-f43f8000q-cleanyourtv-guide/actions/workflows/validate.yml)
+
 Практическое руководство по настройке домашнего экрана CleanYourTV на телевизоре **DEXP F43F8000Q-G с Android 9**. Здесь собраны проверенный на одном устройстве сценарий, скрипты ADB для Windows/Linux, примеры конфигурации, восстановление и правила безопасности.
 
 > **Проверено на одном экземпляре:** DEXP F43F8000Q-G, Android 9.0, пакет CleanYourTV `com.gathin.tvhome`. Ревизии платы и прошивки могут отличаться. Это руководство не является прошивкой и не гарантирует совместимость со всеми вариантами модели.
