@@ -94,7 +94,7 @@ function Invoke-Choice($choice) {
         }
         "5" {
             if (Connect-Tv) {
-                $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
+                $stamp = Get-Date -Format "yyyyMMdd-HHmmss-fff"
                 $file = Join-Path $Desktop ("tv-" + $stamp + ".png")
                 $adbPath = (Get-Command adb -ErrorAction Stop).Source
                 $psi = New-Object System.Diagnostics.ProcessStartInfo
@@ -104,17 +104,32 @@ function Invoke-Choice($choice) {
                 $psi.CreateNoWindow = $true
                 $psi.RedirectStandardOutput = $true
                 $psi.RedirectStandardError = $true
-                $process = [System.Diagnostics.Process]::Start($psi)
+                $process = $null
                 $stream = $null
+                $stderr = ""
+                $exitCode = -1
                 try {
+                    # Open the target before starting adb so a path/permission error cannot leave
+                    # a child process blocked while writing to an unread pipe.
                     $stream = [System.IO.File]::Open($file, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+                    $process = [System.Diagnostics.Process]::Start($psi)
                     $process.StandardOutput.BaseStream.CopyTo($stream)
+                    $stream.Dispose()
+                    $stream = $null
+                    $stderr = $process.StandardError.ReadToEnd()
+                    $process.WaitForExit()
+                    $exitCode = $process.ExitCode
+                } catch {
+                    Write-Host ("Ошибка захвата скриншота: " + $_.Exception.Message) -ForegroundColor Yellow
+                    if ($null -ne $process -and -not $process.HasExited) {
+                        $process.Kill()
+                        $process.WaitForExit()
+                    }
                 } finally {
                     if ($null -ne $stream) { $stream.Dispose() }
+                    if ($null -ne $process) { $process.Dispose() }
                 }
-                $stderr = $process.StandardError.ReadToEnd()
-                $process.WaitForExit()
-                if ($process.ExitCode -eq 0 -and (Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
+                if ($exitCode -eq 0 -and (Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
                     Write-Host "Скриншот сохранён: $file" -ForegroundColor Green
                     Write-Host "Проверьте изображение на Wi-Fi-имя, адреса и личные сведения перед публикацией."
                 } else {
@@ -122,7 +137,6 @@ function Invoke-Choice($choice) {
                     if (-not [string]::IsNullOrWhiteSpace($stderr)) { Write-Host $stderr -ForegroundColor DarkYellow }
                     Write-Host "Не удалось сохранить скриншот; пустой или неполный файл удалён." -ForegroundColor Yellow
                 }
-                $process.Dispose()
             }
         }
         "6" {
