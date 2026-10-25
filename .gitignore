@@ -1,0 +1,12 @@
+# Local/private TV diagnostics and backups
+*.log
+*.dump
+*.backup
+backup/
+private/
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
