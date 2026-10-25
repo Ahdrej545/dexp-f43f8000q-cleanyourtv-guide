@@ -8,12 +8,12 @@
 - Добавлена проверка синтаксиса PowerShell на Windows runner без выполнения скриптов.
 - Обновлена версия `actions/checkout` до v7.0.1, использующей современный runtime.
 
-## 0.2.3 — repository audit
+## 0.2.3 — аудит репозитория
 
-- Hardened ADB connection checks and screenshot/backup error handling in the menu scripts.
-- Added read-only connection validation to the diagnostic script.
-- Made configuration-only examples independent from a separate wallpaper file.
-- Added contribution guidance and static repository validation.
+- Усилены проверки подключения ADB и обработка ошибок при сохранении скриншота и копировании настроек.
+- Диагностический скрипт теперь проверяет подключение до чтения сведений о телевизоре.
+- Примеры JSON не требуют отдельного файла обоев.
+- Добавлены правила участия в проекте и статическая проверка файлов репозитория.
 
 ## 0.2.2 — screenshot and docs polish
 
