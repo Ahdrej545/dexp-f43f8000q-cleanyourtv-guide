@@ -1,7 +1,16 @@
-# Security policy
+# Политика безопасности
 
-This repository documents user-level Android TV launcher configuration. It is not firmware and does not include root exploits.
+Репозиторий содержит пользовательские инструкции и ADB-скрипты для Android TV. Это не прошивка, не root-инструментарий и не пакет для обхода защиты устройства.
 
-Please do not post network ADB credentials, public IPs, serial numbers, MAC addresses, unredacted device dumps, or private backups in issues.
+## Безопасное использование
 
-Network ADB should be enabled only when needed and disabled after configuration. Please report unsafe instructions or model-specific failures through a GitHub issue without including personal identifiers.
+- Включай сетевой ADB только на время настройки и отключай его после завершения работ.
+- Не публикуй IP-адреса домашней сети, Wi-Fi-имена, MAC-адреса, серийные номера, ADB-ключи, полные дампы настроек или личные резервные копии.
+- Не отключай и не удаляй системные пакеты без проверки на конкретной модели и подтверждённого пути отката.
+- Перед запуском прочитай скрипт. Автоматическая проверка в CI анализирует файлы, но не запускает команды на телевизоре.
+
+## Сообщение о проблеме
+
+Обычные ошибки и предложения можно отправлять через [GitHub Issues](https://github.com/Ahdrej545/dexp-f43f8000q-cleanyourtv-guide/issues), удалив из сообщения личные идентификаторы.
+
+Если обнаружена потенциальная уязвимость, не публикуй рабочий эксплойт или секреты в открытом issue. Используй приватное сообщение владельцу репозитория или функцию приватного сообщения об уязвимости во вкладке **Security**, если она доступна для репозитория.
