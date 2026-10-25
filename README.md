@@ -115,7 +115,7 @@ chmod +x scripts/tv-menu.sh
 Для диагностики в Windows:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts/inspect-tv.ps1
+powershell -ExecutionPolicy Bypass -File .\scripts\inspect-tv.ps1
 ```
 
 Скрипты не отключают и не удаляют пакеты. Перезагрузка — отдельный пункт с подтверждением. До использования просмотри исходный код и убедись, что понимаешь команды.
