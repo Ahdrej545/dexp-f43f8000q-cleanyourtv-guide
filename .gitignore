@@ -2,8 +2,14 @@
 *.log
 *.dump
 *.backup
+*.bak
 backup/
 private/
+*.adbkey
+adbkey
+adbkey.pub
+.env
+.env.*
 
 # OS/editor files
 .DS_Store
