@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.3 — repository audit
+
+- Hardened ADB connection checks and screenshot/backup error handling in the menu scripts.
+- Added read-only connection validation to the diagnostic script.
+- Made configuration-only examples independent from a separate wallpaper file.
+- Added contribution guidance and static repository validation.
+
 ## 0.2.2 — screenshot and docs polish
 
 - Добавлен скриншот домашнего экрана с замаскированным названием Wi-Fi-сети.
