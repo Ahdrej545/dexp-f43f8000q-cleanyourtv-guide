@@ -46,9 +46,8 @@ for path in svg_files:
     except Exception as exc:
         fail(f"{path.relative_to(ROOT)}: invalid SVG/XML ({exc})")
 
-markdown_files = [ROOT / "README.md", ROOT / "CONTRIBUTING.md"]
-markdown_files += sorted((ROOT / "docs").rglob("*.md"))
-markdown_files += sorted((ROOT / "examples").rglob("*.md"))
+# Audit every Markdown file, including the changelog and security policy.
+markdown_files = sorted(ROOT.rglob("*.md"))
 link_re = re.compile(r"!?\[[^\]]*\]\(([^)]+)\)")
 for md in markdown_files:
     if not md.exists():
@@ -72,24 +71,25 @@ if sys.platform != "win32" and subprocess.run(["bash", "-n", str(ROOT / "scripts
     result = subprocess.run(["bash", "-n", str(ROOT / "scripts" / "tv-menu.sh")], capture_output=True, text=True)
     fail(f"scripts/tv-menu.sh: bash syntax error: {result.stderr.strip()}")
 
-for path in (ROOT / "README.md", ROOT / "docs", ROOT / "examples", ROOT / "scripts", ROOT / "assets"):
-    files = [path] if path.is_file() else (path.rglob("*") if path.exists() else [])
-    for file in files:
-        if not file.is_file() or file.suffix.lower() in {".jpg", ".jpeg", ".png", ".svg"}:
-            continue
-        try:
-            content = file.read_text(encoding="utf-8")
-        except UnicodeDecodeError:
-            continue
-        # This validator contains the example patterns it searches for, so exclude only
-        # its own source file from the repository-content privacy scan.
-        if file.resolve() == Path(__file__).resolve():
-            continue
-        rel = file.relative_to(ROOT).as_posix()
-        if "192.168.1.107" in content or "Keenetic-6281" in content:
-            fail(f"{rel}: possible private network identifier found")
-        if re.search(r"adb\s+shell\s+pm\s+disable-user.*com\.yandex\.tv\.home", content):
-            fail(f"{rel}: do not recommend disabling the stock launcher generically")
+# Scan all repository text files for the example owner's network identifiers and
+# unsafe generic commands. Binary screenshots are excluded; SVG remains text-scanned.
+for file in ROOT.rglob("*"):
+    if not file.is_file() or ".git" in file.parts:
+        continue
+    if file.suffix.lower() in {".jpg", ".jpeg", ".png", ".webp", ".gif", ".ico"}:
+        continue
+    try:
+        text_content = file.read_text(encoding="utf-8")
+    except (UnicodeDecodeError, OSError):
+        continue
+    # This validator contains the patterns it searches for, so exclude only its own source.
+    if file.resolve() == Path(__file__).resolve():
+        continue
+    rel = file.relative_to(ROOT).as_posix()
+    if "192.168.1.107" in text_content or "Keenetic-6281" in text_content:
+        fail(f"{rel}: possible private network identifier found")
+    if re.search(r"adb\s+shell\s+pm\s+disable-user.*com\.yandex\.tv\.home", text_content):
+        fail(f"{rel}: do not recommend disabling the stock launcher generically")
 
 if errors:
     print("Repository validation FAILED:")
