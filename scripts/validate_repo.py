@@ -81,6 +81,10 @@ for path in (ROOT / "README.md", ROOT / "docs", ROOT / "examples", ROOT / "scrip
             content = file.read_text(encoding="utf-8")
         except UnicodeDecodeError:
             continue
+        # This validator contains the example patterns it searches for, so exclude only
+        # its own source file from the repository-content privacy scan.
+        if file.resolve() == Path(__file__).resolve():
+            continue
         rel = file.relative_to(ROOT).as_posix()
         if "192.168.1.107" in content or "Keenetic-6281" in content:
             fail(f"{rel}: possible private network identifier found")
