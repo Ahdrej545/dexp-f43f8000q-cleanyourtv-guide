@@ -96,15 +96,33 @@ function Invoke-Choice($choice) {
             if (Connect-Tv) {
                 $stamp = Get-Date -Format "yyyyMMdd-HHmmss"
                 $file = Join-Path $Desktop ("tv-" + $stamp + ".png")
-                $cmd = 'adb -s ' + $script:TvAddr + ' exec-out screencap -p > "' + $file + '"'
-                cmd.exe /d /s /c $cmd
-                if ($LASTEXITCODE -eq 0 -and (Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
+                $adbPath = (Get-Command adb -ErrorAction Stop).Source
+                $psi = New-Object System.Diagnostics.ProcessStartInfo
+                $psi.FileName = $adbPath
+                $psi.Arguments = '-s "' + $script:TvAddr + '" exec-out screencap -p'
+                $psi.UseShellExecute = $false
+                $psi.CreateNoWindow = $true
+                $psi.RedirectStandardOutput = $true
+                $psi.RedirectStandardError = $true
+                $process = [System.Diagnostics.Process]::Start($psi)
+                $stream = $null
+                try {
+                    $stream = [System.IO.File]::Open($file, [System.IO.FileMode]::CreateNew, [System.IO.FileAccess]::Write, [System.IO.FileShare]::None)
+                    $process.StandardOutput.BaseStream.CopyTo($stream)
+                } finally {
+                    if ($null -ne $stream) { $stream.Dispose() }
+                }
+                $stderr = $process.StandardError.ReadToEnd()
+                $process.WaitForExit()
+                if ($process.ExitCode -eq 0 -and (Test-Path -LiteralPath $file) -and (Get-Item -LiteralPath $file).Length -gt 0) {
                     Write-Host "Скриншот сохранён: $file" -ForegroundColor Green
                     Write-Host "Проверьте изображение на Wi-Fi-имя, адреса и личные сведения перед публикацией."
                 } else {
                     Remove-Item -LiteralPath $file -Force -ErrorAction SilentlyContinue
-                    Write-Host "Не удалось сохранить скриншот; пустой файл удалён." -ForegroundColor Yellow
+                    if (-not [string]::IsNullOrWhiteSpace($stderr)) { Write-Host $stderr -ForegroundColor DarkYellow }
+                    Write-Host "Не удалось сохранить скриншот; пустой или неполный файл удалён." -ForegroundColor Yellow
                 }
+                $process.Dispose()
             }
         }
         "6" {
