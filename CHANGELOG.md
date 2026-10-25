@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.2.4 — final audit fixes
+
+- Исправлена проверка приватных идентификаторов, которая ранее находила собственные строки валидатора.
+- Проверка GitHub Actions успешно проходит после исправления.
+- Скриншоты в PowerShell сохраняются напрямую в файл, без передачи пути через `cmd.exe`.
+- Обновлена версия `actions/checkout` до v7.0.1, использующей современный runtime.
+
 ## 0.2.3 — repository audit
 
 - Hardened ADB connection checks and screenshot/backup error handling in the menu scripts.
